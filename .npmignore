@@ -6,5 +6,6 @@ logs
 .npmrc
 ssl/*.key
 ssl/*.crt
+data/*.mdb
 src/__tests__/
 dist/__tests__/
