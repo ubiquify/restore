@@ -1,0 +1,7 @@
+dist/
+node_modules/
+data/*.mdb
+ssl/*.key
+ssl/*.crt
+*.tsbuildinfo
+*.tgz

@@ -1,0 +1,41 @@
+openapi: 3.0.0
+info:
+  title: Block Store API
+  version: 1.0.0
+paths:
+  /blocks/{cid}:
+    parameters:
+      - name: cid
+        in: path
+        required: true
+        schema:
+          type: string
+    put:
+      summary: Store a Block
+      requestBody:
+        description: Block data
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '201':
+          description: Created
+        '500':
+          description: Internal Server Error
+    get:
+      summary: Retrieve a Block
+      responses:
+        '200':
+          description: OK
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
