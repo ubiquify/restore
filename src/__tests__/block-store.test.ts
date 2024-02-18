@@ -4,11 +4,11 @@ import { v4 as uuid } from "uuid";
 describe("Block Store", () => {
   let blockStore: ClosableBlockStore;
 
-  beforeAll(() => {
+  beforeEach(() => {
     blockStore = lmdbBlockStoreFactory(`/tmp/block-store-${uuid()}`);
   });
 
-  afterAll(() => {
+  afterEach(() => {
     blockStore.close();
   });
 
@@ -23,5 +23,22 @@ describe("Block Store", () => {
   it("should throw an error when retrieving a non-existent block", async () => {
     const nonExistentCid = "non-existent-cid";
     expect(blockStore.get(nonExistentCid)).toBeUndefined();
+  });
+
+  it("should return an empty array when no cids are stored", async () => {
+    const cids = blockStore.cids({ start: "0", end: "z", limit: 10 });
+    expect(cids).toEqual([]);
+  });
+
+  it("should return the cids stored in the block store", async () => {
+    const cids = ["a", "b", "c", "d", "e"];
+    for (const cid of cids) {
+      await blockStore.put({
+        cid,
+        buffer: Buffer.from(new TextEncoder().encode(cid)),
+      });
+    }
+    const retrievedCids = blockStore.cids({ start: "0", end: "z", limit: 10 });
+    expect(retrievedCids).toEqual(cids);
   });
 });

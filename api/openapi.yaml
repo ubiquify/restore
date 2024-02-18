@@ -21,21 +21,54 @@ paths:
               type: string
               format: binary
       responses:
-        '201':
+        "201":
           description: Created
-        '500':
+        "500":
           description: Internal Server Error
     get:
       summary: Retrieve a Block
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/octet-stream:
               schema:
                 type: string
                 format: binary
-        '404':
+        "404":
           description: Not Found
-        '500':
+        "500":
+          description: Internal Server Error
+  /cids:
+    get:
+      summary: Retrieve stored content identifiers
+      parameters:
+        - name: start
+          in: query
+          schema:
+            type: string
+          description: Range start
+          default: "0"
+        - name: end
+          in: query
+          schema:
+            type: string
+          description: Range end
+          default: "z"
+        - name: limit
+          in: query
+          schema:
+            type: integer
+          description: Maximum number of results
+          default: 10
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        "500":
           description: Internal Server Error

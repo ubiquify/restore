@@ -8,6 +8,15 @@ export interface Block {
 export interface BlockStore {
   put: (block: { cid: any; buffer: Buffer }) => Promise<void>;
   get: (cid: any) => Buffer;
+  cids: ({
+    start,
+    end,
+    limit,
+  }: {
+    start: string;
+    end: string;
+    limit: number;
+  }) => string[];
 }
 
 export interface ClosableBlockStore extends BlockStore {
@@ -33,9 +42,28 @@ export const lmdbBlockStoreFactory = (path: string): ClosableBlockStore => {
     await db.close();
   };
 
+  const cids = ({
+    start,
+    end,
+    limit,
+  }: {
+    start: string;
+    end: string;
+    limit: number;
+  }): string[] => {
+    const options = {
+      start,
+      end,
+      limit,
+    };
+    const keys = Array.from(db.getKeys(options));
+    return keys.map((key) => key.toString());
+  };
+
   return {
     put,
     get,
     close,
+    cids,
   };
 };

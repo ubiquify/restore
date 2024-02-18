@@ -1,6 +1,6 @@
 {
   "name": "@ubiquify/restore",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Simple block store for local network",
   "repository": "https://github.com/ubiquify/restore.git",
   "type": "module",

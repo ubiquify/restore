@@ -11,7 +11,7 @@ import { createRestoreServer, RestoreServer } from "../restore";
 describe("createRestInterface", () => {
   let restoreServer: RestoreServer;
   let httpClient: AxiosInstance;
-  beforeAll(() => {
+  beforeEach(() => {
     const blockStore = lmdbBlockStoreFactory(`/tmp/block-store-${uuid()}`);
     restoreServer = createRestoreServer(blockStore);
     restoreServer.startHttp(3011, () => {});
@@ -20,7 +20,7 @@ describe("createRestInterface", () => {
     });
   });
 
-  afterAll(() => {
+  afterEach(() => {
     restoreServer.stopHttp(() => {});
   });
 
@@ -38,6 +38,27 @@ describe("createRestInterface", () => {
     expect(response.status).toBe(201);
     const retrievedBytes = await retrieve(httpClient, cid);
     expect(retrievedBytes).toEqual(bytes);
+  });
+
+  it("should return 404 when retrieving a non-existent block", async () => {
+    const cid = "non-existent-cid";
+    try {
+      const response = await httpClient.get(`/blocks/${cid}`);
+      fail("Expected an error");
+    } catch (error) {
+      expect(error.response.status).toBe(404);
+    }
+  });
+
+  it("should list the cids stored in the block store", async () => {
+    const cids = ["a", "b", "c", "d", "e"];
+    for (const cid of cids) {
+      const bytes = new TextEncoder().encode(cid);
+      await store(httpClient, cid, bytes);
+    }
+    const response = await httpClient.get("/cids");
+    expect(response.status).toBe(200);
+    expect(response.data).toEqual(cids);
   });
 });
 
