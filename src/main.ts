@@ -23,13 +23,13 @@ const restoreServer: RestoreServer = createRestoreServer(blockStore);
 
 restoreServer.startHttp(httpPort, () => {
   console.log(
-    `Restore server listening on http port ${httpPort}, isDockerEnv: ${isDockerEnv}, persistencePath: ${persistencePath}`
+    `Restore server listening on http port ${httpPort}, isDockerEnv: ${isDockerEnv}, persistencePath: ${persistencePath}, url: http://localhost:${httpPort}`
   );
 });
 
 restoreServer.startHttps(httpsPort, getCertificate(), () => {
   console.log(
-    `Restore server listening on https port ${httpsPort}, isDockerEnv: ${isDockerEnv}, persistencePath: ${persistencePath}`
+    `Restore server listening on https port ${httpsPort}, isDockerEnv: ${isDockerEnv}, persistencePath: ${persistencePath}, url: https://localhost:${httpsPort}`
   );
 });
 

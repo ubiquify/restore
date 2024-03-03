@@ -7,6 +7,8 @@ import {
 } from "../block-store";
 import { v4 as uuid } from "uuid";
 import { createRestoreServer, RestoreServer } from "../restore";
+import https from "https";
+import { getCertificate } from "../cert";
 
 describe("createRestInterface", () => {
   let restoreServer: RestoreServer;
@@ -14,14 +16,17 @@ describe("createRestInterface", () => {
   beforeEach(() => {
     const blockStore = lmdbBlockStoreFactory(`/tmp/block-store-${uuid()}`);
     restoreServer = createRestoreServer(blockStore);
-    restoreServer.startHttp(3011, () => {});
+    restoreServer.startHttps(3011, getCertificate(), () => {});
     httpClient = axios.create({
-      baseURL: "http://localhost:3011",
+      httpsAgent: new https.Agent({
+        rejectUnauthorized: false,
+      }),
+      baseURL: "https://localhost:3011",
     });
   });
 
   afterEach(() => {
-    restoreServer.stopHttp(() => {});
+    restoreServer.stopHttps(() => {});
   });
 
   it("should store a block when receiving a PUT request", async () => {
@@ -34,6 +39,19 @@ describe("createRestInterface", () => {
   it("should retrieve a block when receiving a GET request", async () => {
     const cid = "QmV5kz2FJNpGk7U2qL7v6QbC5w5VQcCv8YsZmUH5y1Ux";
     const bytes = new TextEncoder().encode("hello world");
+    const response = await store(httpClient, cid, bytes);
+    expect(response.status).toBe(201);
+    const retrievedBytes = await retrieve(httpClient, cid);
+    expect(retrievedBytes).toEqual(bytes);
+  });
+
+  
+  it("should store and retrieve 512Kb of data", async () => {
+    const cid = "QmV5kz2FJNpGk7U2qL7v6QbC5w5VQcCv8YsZmUH5y1Ux";
+    const bytes = new Uint8Array(512 * 1024);
+    for (let i = 0; i < bytes.length; i++) {
+      bytes[i] = i % 256;
+    }
     const response = await store(httpClient, cid, bytes);
     expect(response.status).toBe(201);
     const retrievedBytes = await retrieve(httpClient, cid);

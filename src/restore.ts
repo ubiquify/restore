@@ -18,6 +18,7 @@ export const createRestoreServer = (
   blockStore: ClosableBlockStore
 ): RestoreServer => {
   let httpServer: http.Server | undefined;
+  let httpsServer: https.Server | undefined;
 
   const createApplication = () => {
     return createRestInterface(blockStore);
@@ -44,14 +45,14 @@ export const createRestoreServer = (
     callback: () => void
   ): https.Server => {
     const app = createApplication();
-    const httpsServer = https.createServer(options, app);
+    httpsServer = https.createServer(options, app);
     httpsServer.listen(port, callback);
     return httpsServer;
   };
 
   const stopHttps = (callback: () => void): void => {
     try {
-      if (httpServer) httpServer.close(callback);
+      if (httpsServer) httpsServer.close(callback);
     } finally {
       blockStore.close();
     }

@@ -6,7 +6,7 @@ export const createRestInterface = (blockStore: BlockStore): Application => {
   const configure = (): Application => {
     const app = express();
     app.use(cors());
-    app.use(express.raw({ type: "application/octet-stream" }));
+    app.use(express.raw({ type: "application/octet-stream", limit: "10mb" }));
 
     app.put("/blocks/:cid", async (req: Request, res: Response) => {
       try {
