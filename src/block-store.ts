@@ -17,6 +17,7 @@ export interface BlockStore {
     end: string;
     limit: number;
   }) => string[];
+  clear: () => Promise<void>;
 }
 
 export interface ClosableBlockStore extends BlockStore {
@@ -60,10 +61,15 @@ export const lmdbBlockStoreFactory = (path: string): ClosableBlockStore => {
     return keys.map((key) => key.toString());
   };
 
+  const clear = async (): Promise<void> => {
+    await db.clearAsync();
+  };
+
   return {
     put,
     get,
     close,
     cids,
+    clear,
   };
 };

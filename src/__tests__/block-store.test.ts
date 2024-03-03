@@ -41,4 +41,14 @@ describe("Block Store", () => {
     const retrievedCids = blockStore.cids({ start: "0", end: "z", limit: 10 });
     expect(retrievedCids).toEqual(cids);
   });
+
+  it("should clear the block store", async () => {
+    const cid = "QmV5kz2FJNpGk7U2qL7v6QbC5w5VQcCv8YsZmUH5y1Ux";
+    const bytes = new TextEncoder().encode("hello world");
+    await blockStore.put({ cid, buffer: Buffer.from(bytes) });
+    await blockStore.clear();
+    const retrievedBuffer = blockStore.get(cid);
+    expect(retrievedBuffer).toBeUndefined();
+  });
+  
 });

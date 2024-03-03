@@ -34,6 +34,15 @@ export const createRestInterface = (blockStore: BlockStore): Application => {
       }
     });
 
+    app.delete("/blocks", async (req: Request, res: Response) => {
+      try {
+        await blockStore.clear();
+        res.status(204).send();
+      } catch (err) {
+        res.status(500).send();
+      }
+    });
+
     app.get("/cids", (req: Request, res: Response) => {
       try {
         const start = (req.query.start as string) || "0";

@@ -45,7 +45,6 @@ describe("createRestInterface", () => {
     expect(retrievedBytes).toEqual(bytes);
   });
 
-  
   it("should store and retrieve 512Kb of data", async () => {
     const cid = "QmV5kz2FJNpGk7U2qL7v6QbC5w5VQcCv8YsZmUH5y1Ux";
     const bytes = new Uint8Array(512 * 1024);
@@ -77,6 +76,26 @@ describe("createRestInterface", () => {
     const response = await httpClient.get("/cids");
     expect(response.status).toBe(200);
     expect(response.data).toEqual(cids);
+  });
+
+  it("should return an empty array when no cids are stored", async () => {
+    const response = await httpClient.get("/cids");
+    expect(response.status).toBe(200);
+    expect(response.data).toEqual([]);
+  });
+
+  it("should clear the block store", async () => {
+    const cid = "QmV5kz2FJNpGk7U2qL7v6QbC5w5VQcCv8YsZmUH5y1Ux";
+    const bytes = new TextEncoder().encode("hello world");
+    await store(httpClient, cid, bytes);
+    const response = await httpClient.delete("/blocks");
+    expect(response.status).toBe(204);
+    try {
+      const response = await httpClient.get(`/blocks/${cid}`);
+      fail("Expected an error");
+    } catch (error) {
+      expect(error.response.status).toBe(404);
+    }
   });
 });
 
